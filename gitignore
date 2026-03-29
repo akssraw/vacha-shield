@@ -1,0 +1,61 @@
+# =============================================
+# VACHA-SHIELD .gitignore
+# =============================================
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+.uv-cache/
+.venv/
+venv/
+env/
+
+# --- Logs ---
+*.log
+replay_pid*.log
+hs_err_pid*.log
+deploy_*.log
+app_run_*.log
+
+# --- Large Dataset Folders (DO NOT UPLOAD) ---
+continuous_learning_dataset/
+flagged_calls/
+data/
+model_backup_*.pth
+
+# --- Node / Frontend ---
+node_modules/
+lovable-project-*/node_modules/
+lovable-project-*/dist/
+
+# --- Environment & Secrets ---
+.env
+.env.local
+*.env
+
+# --- Temp / Runtime Files ---
+ambient_temp*.wav
+temp_*.wav
+dummy_test.wav
+vacha_shield_runtime/
+
+# --- OS Files ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- IDE ---
+.vscode/
+.idea/
+*.suo
+*.user
+
+# --- Git LFS tracked separately ---
+# model.pth is tracked via Git LFS (see .gitattributes)
