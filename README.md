@@ -1,59 +1,143 @@
----
-title: Vacha Shield 2.0
-sdk: docker
-app_port: 7860
+# Vacha-Shield 2.0 🛡️
+
+**AI-powered deepfake voice detection for real-time call protection.**
+
+Vacha-Shield listens to live calls, detects AI-cloned voices using a custom neural network, transcribes speech in Hindi/Hinglish/English, and alerts users to potential scams — all in real time.
+
 ---
 
-Vacha-Shield is an AI deepfake voice detection system for web and mobile-assisted call monitoring.
+## What It Does
+
+- **Deepfake Detection** — Detects AI-cloned and synthetic voices using a CNN neural network with PCEN + Delta spectrograms
+- **Live Call Monitoring** — Continuously analyzes microphone audio during calls
+- **Live Transcription** — Transcribes Hindi, Hinglish, and English speech using Sarvam AI
+- **Scam Keyword Detection** — Automatically flags dangerous phrases like OTP, KYC, UPI PIN, remote access
+- **Continuous Learning** — Users submit labeled clips via the web UI to retrain the model
+
+---
 
 ## Quick Start
 
-1. Install dependencies:
-   `pip install -r requirements.txt`
-2. Run backend:
-   `python app.py`
-3. Open:
-   `http://127.0.0.1:5000`
+### 1. Install dependencies
 
-## Core Files
+```bash
+pip install -r requirements.txt
+```
 
-- `app.py` - Flask API + UI serving
-- `deepfake_detector.py` - Hybrid inference and scoring logic
-- `feature_extraction.py` - PCEN + Delta feature pipeline
-- `model.py` - AudioCNN architecture
-- `train_knowledge_base.py` - Continuous learning retraining
+For microphone tools:
 
-## Architecture
+```bash
+pip install -r requirements-optional.txt
+```
 
-See `docs/architecture.png`.
+### 2. Set up environment variables
+
+Create a `.env` file in the project root:
+
+```env
+GROQ_API_KEY=your_groq_key_here
+SARVAM_API_KEY=your_sarvam_key_here
+```
+
+### 3. Run the backend
+
+```bash
+python app.py
+```
+
+Open: [http://127.0.0.1:5000](http://127.0.0.1:5000)
+
+---
+
+### Analysis Profiles
+
+| Profile | Sensitivity | Best For |
+|---------|-------------|----------|
+| `conservative` | Low | Minimize false positives |
+| `balanced` | Medium | General use |
+| `strict` | High | Default |
+| `forensic` | Very High | Deep investigation |
+
+---
+
+## Call Monitor
+
+Runs in terminal and listens to live microphone audio:
+
+```bash
+python call_monitor.py
+```
+
+**Features:**
+- Deepfake detection every 4 seconds
+- Live Hindi/Hinglish/English transcription (requires `SARVAM_API_KEY`)
+- Automatic scam keyword flagging
+- Saves suspicious clips to `flagged_calls/`
+
+---
+
+## Training
+
+### Train on ASVspoof 2019
+
+```bash
+python train_model.py \
+  --dataset_dir data/ASVspoof2019_LA_train \
+  --protocol_file data/ASVspoof2019_LA_train/ASVspoof2019.LA.cm.train.trn.txt \
+  --epochs 20
+```
+
+### Continuous Learning
+
+Collect samples via the web UI feedback buttons, then:
+
+```bash
+python train_knowledge_base.py
+```
+
+---
 
 ## Deployment
 
-See `DEPLOY_FREE.md` for the recommended free-hosting paths.
+### Docker
 
-- Best free link longevity: Hugging Face Spaces with the included `Dockerfile`
-- Fastest GitHub-to-public-URL path: Render with the included `render.yaml`
-- `railway.json` is kept for credit-based Railway deploys, but Railway is no longer the best fit for a lasting free public demo
+```bash
+docker build -t vacha-shield .
+docker run -p 7860:7860 \
+  -e GROQ_API_KEY=your_key \
+  -e SARVAM_API_KEY=your_key \
+  vacha-shield
+```
 
-## Container Notes
+---
 
-- The container serves a bundled Lovable build from `/app/lovable-dist` when present.
-- If no bundled dist exists, the app falls back to the legacy Flask templates in `templates/`.
-- Include `model.pth` and `model_calibration.json` in the deployed repo so inference works.
+## Environment Variables
 
-Optional environment variables:
-- `GROQ_API_KEY`
-- `GROQ_MODEL`
-- `SEMANTIC_OVERRIDE_ENABLED`
-- `DEFAULT_ANALYSIS_PROFILE`
-- `ALERT_MIN_THRESHOLD`
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `GROQ_API_KEY` | — | Groq LLM key for semantic detection |
+| `SARVAM_API_KEY` | — | Sarvam AI key for live transcription |
+| `DEFAULT_ANALYSIS_PROFILE` | `strict` | Detection profile |
+| `ALERT_MIN_THRESHOLD` | `0.62` | Minimum probability to trigger alert |
+| `SEMANTIC_OVERRIDE_ENABLED` | `false` | Enable LLM-based AI self-identification |
+| `PORT` | `5000` | Server port |
 
-## Curated Training
+---
 
-- List approved data sources: `python sync_approved_sources.py --list`
-- Sync automatic human corpora into the registry: `python sync_approved_sources.py --sync human_yesno human_librispeech_dev_clean --limit 50`
-- Register manually downloaded Hindi human corpora: `python sync_approved_sources.py --register human_common_voice_hi --from-dir "C:\path\to\commonvoice_hi" --limit 300`
-- Register manually downloaded AI datasets like WaveFake or ASVspoof: `python sync_approved_sources.py --register ai_wavefake --from-dir "C:\path\to\dataset" --limit 200`
-- Train with approved sources plus generated English/Hindi/Hinglish clone audio: `python train_internet_model.py --approved_human_sources all --approved_ai_sources all`
+## Tech Stack
 
-See `docs/curated_sources.md` for the guarded data-ingestion flow.
+| Layer | Technology |
+|-------|-----------|
+| Backend | Python · Flask · Flask-SocketIO · Gunicorn |
+| ML | PyTorch · Librosa · NumPy · scikit-learn |
+| Audio | PyAudio · SoundFile · imageio-ffmpeg |
+| Transcription | Sarvam AI (saaras:v3) |
+| LLM | Groq (llama-3.3-70b) |
+| Frontend | React · TypeScript · Vite · Tailwind CSS |
+| Deployment | Docker |
+
+---
+
+## Built By
+
+**Aksshat S. Rawat** — India Innovates 2026
