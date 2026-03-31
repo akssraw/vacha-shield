@@ -1,4 +1,4 @@
-# Vacha-Shield 2.0 🛡️
+# Vacha_Shield
 
 **AI-powered deepfake voice detection for real-time call protection.**
 
